@@ -1,99 +1,49 @@
-"use client"
+import React, { useState } from "react";
 
-import { useState } from 'react'
-import { Todo } from '@/types/todo'
+type TodoPriority = "low" | "medium" | "high";
 
-interface TodoFormProps {
-  onAddTodo: (todo: Omit<Todo, 'id' | 'createdAt' | 'updatedAt'>) => void
-}
+type TodoFormProps = {
+  onAdd: (todo: {
+    title: string;
+    description?: string;
+    dueDate?: string;
+    priority: TodoPriority;
+  }) => void;
+};
 
-export const TodoForm: React.FC<TodoFormProps> = ({ onAddTodo }) => {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    priority: 'medium' as const,
-    category: 'General',
-    dueDate: ''
-  })
+export default function TodoForm({ onAdd }: TodoFormProps) {
+  const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState<TodoPriority>("medium");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.title.trim()) return
-
-    onAddTodo({
-      title: formData.title.trim(),
-      description: formData.description.trim() || undefined,
-      completed: false,
-      priority: formData.priority,
-      category: formData.category,
-      dueDate: formData.dueDate || undefined
-    })
-
-    setFormData({
-      title: '',
-      description: '',
-      priority: 'medium',
-      category: 'General',
-      dueDate: ''
-    })
-  }
+  const handleSubmit = () => {
+    if (!title.trim()) return;
+    onAdd({ title, priority });
+    setTitle("");
+    setPriority("medium");
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-8 p-6 bg-white rounded-lg shadow-md border">
-      <h2 className="text-xl font-semibold mb-4">Add New Todo</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Todo title..."
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        
-        <input
-          type="text"
-          placeholder="Category"
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <textarea
-        placeholder="Description (optional)..."
-        value={formData.description}
-        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-        rows={3}
+    <div className="flex gap-2 mb-4">
+      {/* for todo input */}
+      <input
+        className="border border-gray-300 rounded-md p-2 flex-1
+                  focus:border-blue-500 focus:ring-1 focus:ring-blue-300
+                    transition"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Add new todo"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <select
-          value={formData.priority}
-          onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="low">Low Priority</option>
-          <option value="medium">Medium Priority</option>
-          <option value="high">High Priority</option>
-        </select>
-
-        <input
-          type="date"
-          value={formData.dueDate}
-          onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
       <button
-        type="submit"
-        className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onClick={handleSubmit}
+        className="
+    bg-blue-600 text-white px-5 py-2 rounded-md
+    hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300
+    transition-colors
+  "
       >
-        Add Todo
+        Add
       </button>
-    </form>
-  )
+    </div>
+  );
 }
